@@ -1,0 +1,83 @@
+function [sp,r] = car_racing(s,a) %la velocità è dentro lo stato
+% a -> modifica velocità: +1,-1,0 per dx, sx, su
+D = 50; %dimensione griglia
+S = D*D; 
+A = 9; %numero azioni
+Vx = 5 + 1; %velocità va da 0 a 5
+Vy = 5 + 1;
+
+%mappiamo stato in righe e colonne
+[pos, vx,vy] = ind2sub([S,Vx,Vy],s);
+
+
+% trovo velocità vx e vy in base ad a
+if a == 1
+    vx = vx + 1;
+    vy = vy + 1;
+
+elseif a == 2
+    vx = vx + 1;
+    vy = vy - 1;
+
+elseif a == 3
+    vx = vx + 1;
+    vy = vy + 0;
+
+elseif a == 4
+    vx = vx - 1;
+    vy = vy + 1;
+
+elseif a == 5
+    vx = vx - 1;
+    vy = vy - 1;
+
+elseif a == 6
+    vx = vx - 1;
+    vy = vy + 0;
+
+
+elseif a == 7
+    vx = vx + 0;
+    vy = vy + 1;
+
+elseif a == 8
+    vx = vx + 0;
+    vy = vy - 1;
+
+elseif a == 9
+    vx = vx + 0;
+    vy = vy + 0;
+
+else
+    error('Action not allowed');
+
+end
+
+%controllo velocità max e min vx
+if vx > 5 
+    vx = 5;
+end
+if vx < 0
+    vx = 0;
+end
+%controllo velocità max e min vy
+if vy > 5 
+    vy = 5;
+end
+if vy < 0
+    vy = 0;
+end
+
+%r+vx e c+vy e trovo lo stato successivo
+sp = sub2ind([S,Vx,Vy], pos, vx,vy)
+
+%in base a dove mi trovo ho reward
+if sp == 1 %sono in pista
+    r = -1;
+elseif sp == 0 %fuori pista
+    r = -5;
+elseif sp == 2 %linea di arrivo
+    r = +10;
+    sp = -1;
+end
+
