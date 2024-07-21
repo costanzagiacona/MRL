@@ -174,7 +174,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e,config
         % disegno_snake(locx, locy);
         % stato terminale
         sp = - 1; 
-        r = - 1;
+        r = - 5;
         ap = direction;
         count_m = count_m + 1;
     else

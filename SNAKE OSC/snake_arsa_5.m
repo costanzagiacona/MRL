@@ -53,6 +53,9 @@ point = 0;
 % andamento del punteggio
 point_tot = 0;
 
+% vettore degli stati
+% states = zeros(1, S);
+
 %epsilon = 0;
 % iterazione ricorsiva per ogni episodio
 for e = 1 :numEpisodes
@@ -138,7 +141,7 @@ for e = 1 :numEpisodes
             %posizione iniziale serpente
             locx = [5 5 5 5 5]; %pos orizzontale
             locy = [4 5 6 7 8]; %pos verticale
-            aprev = 2; %verso sinistra
+            aprev = 3; %verso il basso
             % traduco le coordinate del serpente rispetto alla testa, per determinare
             % la onfigurazione
             loc_cfx = locx - locx(1);
@@ -167,6 +170,7 @@ for e = 1 :numEpisodes
         % altrimenti viene aggiornata la funzione qualita e l serpente continua il
         % suo pecorso
         else
+            states(sp) = states(sp)+1;
             %target preso            
             if r == 10
                 point = point+1;
@@ -194,7 +198,7 @@ for e = 1 :numEpisodes
     end
 
     if mod(e, 100) == 0
-         % GLIE
+         
         epsilon = epsilon*0.9; %diminuisco epsilon
     end
     history_A(:, e) = count_a;
@@ -226,10 +230,12 @@ subplot(3,1,3)
 % plot(history_P','LineWidth',2)
 plot(punteggio','LineWidth',2)
 title("Storico punteggio")
-
+%%
+figure(4)
+bar(states, 30)
 
 %%
-save qualita5.mat Q history_A history_M punteggio
+save qualita5.mat Q history_A history_M punteggio states
 
 
 
