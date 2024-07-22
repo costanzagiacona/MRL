@@ -13,7 +13,5 @@ function disegno_snake(locx, locy)
         
         rectangle('Position', [locx(i), locy(i), 1,1], 'FaceColor', color(i-1)) % corpo verde
 
-    end
-    
-    
+    end  
 end

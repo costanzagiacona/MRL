@@ -1,7 +1,7 @@
 %% MODELLO DEL SISTEMA
 %calcola il nuovo stato del serpente e il reward associato all'azione da intraprendere
 
-function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
+function [sp, r, muro] = modello_snake_50x50 (s, a, POS, DIR, e, point, muro, muro_min, muro_max)
     % s -> stato, lista contenete locx e locy, la direzione e il target
     % a -> direzione scelta tramite azione greedy
     % e -> episodio corrente
@@ -9,10 +9,10 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     % out
     % sp -> stato successivo
     % r -> reward
-    muro_min = 15;
-    muro_max = 35;
-    lung_int = 10;
-    lung_ext = 20;
+    % muro_min = 15;
+    % muro_max = 34;
+    % lung_int = 10;
+    % lung_ext = 20;
     % Assegna la direzione passata come azione
     direction = a; %azione greedy
     % ***************************** %
@@ -30,7 +30,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     locx = zeros(1, 5);
     locy = zeros(1, 5);
 
-    gg = 10;
+    gg = 100;
     %% Calcolo la posizione e configurazione attuale del serpente dallo stato s %%
     
     %posizione serpente
@@ -181,8 +181,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     if sum((locx(2:end)==locx(1)) & (locy(2:end)==locy(1))) 
        
       game_over(e,gg);
-       
-       % è uno stato terminale 
+        
        r = -5;
        % sp = -1; 
        sp = {pos_fin, direction,s{3}};
@@ -190,7 +189,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     % se il serpente tocca il muro
     elseif variabile == true
         % fprintf("muro toccato")
-        
+        muro = muro + 1;
         game_over(e,gg);
         
         pause(1);

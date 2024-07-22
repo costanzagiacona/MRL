@@ -43,13 +43,13 @@ function bool = controllo_muro50x50(x, y, muro_min, muro_max, numcol, numrow)
 
 
     %%% muro interno %%%
-    % se locx == 75 -> muri a destra
-    % con (locy>=muro_min && locy<=muro_min+15) controllo muro verticale in basso
-    % con (locy>=muro_max-15 && locy<=muro_max) controllo muro verticale in alto
-    % se locx == 25 -> muri a sinistra
+    % se locx == 34 -> muri a destra
+    % con (locy>=muro_min && locy<=muro_min+4) controllo muro verticale in basso
+    % con (locy>=muro_max-4 && locy<=muro_max) controllo muro verticale in alto
+    % se locx == 15 -> muri a sinistra
     % il controllo segue la logica di prima
-    % se locy == 75 -> muri in alto
-    % con (locx>=muro_min && locx<=muro_min+15) controllo muro orizzontale in alto
-    % con (locx>=muro_max-15 && locx<=muro_max) controllo muro orizzontale in alto
+    % se locy == 34 -> muri in alto
+    % con (locx>=muro_min && locx<=muro_min+4) controllo muro orizzontale in alto
+    % con (locx>=muro_max-4 && locx<=muro_max) controllo muro orizzontale in alto
 
 

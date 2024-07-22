@@ -27,11 +27,29 @@ function corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow)
     %generiamo tutte le possibili configurazioni
     [count, configurations] = configurazioni(5);
 
+    % Array per tenere traccia delle configurazioni testate
+    tested = false(1, count);
+    num_tested = 0;
+
     %CORPO
     while(1)
+        if num_tested == count
+            error('Non ci sono configurazioni valide disponibili.');
+        end
         %prendiamo una configurazione random (qui testa sta in [0,0])
         % fprintf("genera snake\n")
-        ind = randi(count); % indice configurazione
+        % ind = randi(count); % indice configurazione
+
+        % Prendiamo una configurazione random non ancora testata
+        while (1)
+            ind = randi(count); % Indice configurazione
+            if ~tested(ind)
+                tested(ind) = true;
+                num_tested = num_tested + 1;
+                break;
+            end
+        end
+
         conf = configurations{ind};%configurazione
         % calcoliamo la posizione del corpo rispetto alla testa 
         corpo(:,1) = conf(:,1) + testa_x; % x

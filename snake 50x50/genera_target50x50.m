@@ -8,7 +8,7 @@ function target = genera_target50x50(muro_min, muro_max, numcol,numrow)
         
         % se il target ha le stesse coordinate del serpente
         % o se il targer è sul muro, , non è valido
-        if ~controllo_muro50x50(tx,ty, muro_min, muro_max, numcol,numrow) 
+        if ~controllo_muro50x50(tx,ty, muro_min, muro_max, numcol, numrow) 
             break
         end
     end

@@ -10,7 +10,7 @@ load qualita.mat
 % Numero di azioni
 A = 4;
 % Numero di episodi
-numEpisodes = 1000;
+numEpisodes = 1e3;
 % Parametro di esplorazione (epsilon-greedy)
 epsilon = 0.8;
 % Parametro di sconto 
@@ -107,6 +107,7 @@ for e = 1:numEpisodes
     fprintf("\n\nEPISODIO -> %d\n",e);
     % disp(e)
     morso = 0;
+    muro = 0;
     %%%%% posizione iniziale serpente %%%%%
     % stato: posizione iniziale, direzione iniziale (3) e target
     s = {pos_ini, rand(A), indtarget};
@@ -136,20 +137,21 @@ for e = 1:numEpisodes
     while true
         % esegue l'azione a e osserva il nuovo stato sp e la ricompensa r
         % disp(a)
-        history_azione(a) =  history_azione(a) +1;
-        [sp, r] = modello_snake_50x50(s, a, POS, DIR,e, point);
-        
+        history_azione(a) =  history_azione(a) + 1;
+        [sp, r, muro] = modello_snake_50x50(s, a, POS, DIR, e, point, muro, muro_min, muro_max);
+        history_muro = [history_muro muro];
+
         % aggiornamento ritorno
         G(e) = G(e) + r;
 
         % STATO TERMINALE
         if r == 5 %%% target preso %%%
-           
             delta = r - sum(w(Fac,a));
             point = point+1;
             fprintf("punteggio: %d\n", point);
             % disp(point)
             fprintf("si è morso %d volte\n", morso);
+            fprintf("ha sbattuto %d volte\n", muro);
             history_morso = [history_morso morso];
         else
             % features dello stato successivo
@@ -210,10 +212,14 @@ for e = 1:numEpisodes
             end
 
             break;
-        end
+        end       
+    end
 
-        
-        
+    if mod(e,20) == 0
+        epsilon = epsilon*0.9;
+        if epsilon < 0.01
+            epsilon = 0.8;
+        end
     end
 end
 %%
@@ -225,9 +231,15 @@ plot(G, 'LineWidth',2)
 %% plot stattistiche
 figure(3)
 bar(history_azione);
+title('Preferenza azioni')
 
 figure(4)
 plot(history_morso);
+title('Frequenza con cui si morde')
+
+figure(5)
+plot(history_muro);
+title('Frequenza con cui colpisce il muro')
 %%
 
 % %% plot optimal value function
