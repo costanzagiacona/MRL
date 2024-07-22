@@ -19,7 +19,7 @@ gamma = 1;
 alpha = 1e-2;
 
 % Dimensione dello spazio degli stati
-POS = [0, 50*50];
+POS = [0, 50];
 DIR = [1, 4];
 
 numrow = 50;
@@ -31,13 +31,13 @@ M = 5; % numero di celle per griglia
 N = 10; % numero di griglie
 
 % Dimensione del vettore dei pesi
-d = (M+1)^3 * N;
+d = (M+1)^4 * N;
 
 % funzione qualita (azioni, lunghezza del serpente)
 % 
 % Q = zeros(A,5);
 % Inizializzazione del vettore dei pesi con valori casuali
-% w = randn(d, A);
+w = randn(d, A);
 
 % Creazione griglie
 [cellPOS, cellDIR] = griglie(POS, DIR, M, N);
@@ -107,16 +107,16 @@ for e = 1:numEpisodes
     
     %%%%% posizione iniziale serpente %%%%%
     % stato: posizione iniziale, direzione iniziale (3) e target
-    s = {pos_ini, 3, indtarget};
+    s = {pos_ini, 3, indtarget}
     
     % feature dello stato iniziale
     Fac = get_features(s, cellPOS, cellDIR, M, N);
     
     % Funzione qualità della testa
     % creiamo la funzine qualita sulla base del vettore dei pesi
-    for i = 1:6
-        Q(:,i) = sum(w(Fac(:,i),:));
-    end
+    
+    Q = sum(w(Fac,:));
+    
     % aggiorniamo il vattore dei pesi delle features attive
 
     %%%%% azione epsilon greedy %%%%%
@@ -140,7 +140,7 @@ for e = 1:numEpisodes
         % STATO TERMINALE
         if r == 5 %%% target preso %%%
            
-            delta = r - sum(w(Fac(:,1),a));
+            delta = r - sum(w(Fac,a));
             point = point+1;
             fprintf("punteggio: ");
             disp(point)
@@ -149,24 +149,21 @@ for e = 1:numEpisodes
             % features dello stato successivo
             Facp = get_features(sp, cellPOS, cellDIR, M, N);
             % calcolo della funzione qualità per lo stato successivo
-            fac1 = Facp(:,1);
+
             % Qp = sum(w(fac1,:));
-            for i = 1:6
-                Qp(:,i) = sum(w(Fac(:,i),:));
-            end
-            for i = 1:4
-                sumQ(i) = sum(Qp(i,:));
-            end
+
+            Qp = sum(w(Facp,:));
+            
+           
             % azione epsilon greedy
             if rand < epsilon
                 ap = randi(A); % take random action
             else
-                % ap = find(Qp == max(Qp), 1, 'first'); % take greedy action 
-                 ap = find(sumQ == max(sumQ), 1, 'first');
+                ap = find(Qp == max(Qp), 1, 'first'); % take greedy action 
             end
 
             % calcolo errore delle differenza temporali
-            delta = r + gamma*sumQ(ap) - sum(w(Fac(:,1),a));
+            delta = r + gamma*Qp(ap) - sum(w(Fac,a));
 
             if r == -5 %%% il serpente si è morso %%%
                 point = 0;
@@ -182,7 +179,7 @@ for e = 1:numEpisodes
              end
         end
         % aggiornamento vettore dei pesi
-        w(Fac(:,1),a) = w(Fac(:,1),a) + alpha*delta;
+        w(Fac,a) = w(Fac,a) + alpha*delta;
         
         if r ~= 5 %stato non terminale
         % aggiornamento stato, azione e features

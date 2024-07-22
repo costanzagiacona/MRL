@@ -30,6 +30,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     locx = zeros(1, 5);
     locy = zeros(1, 5);
 
+    gg = 10;
     %% Calcolo la posizione e configurazione attuale del serpente dallo stato s %%
     
     %posizione serpente
@@ -115,7 +116,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
 
 
      % ****** PLOT GIOCO SERPENTE ******** %
-    if mod(e,1)==0
+    if mod(e,gg)==0
         % pause(t/5);
         %%% AMBIENTE %%%
         figure(5)
