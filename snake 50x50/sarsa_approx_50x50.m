@@ -12,32 +12,32 @@ A = 4;
 % Numero di episodi
 numEpisodes = 1000;
 % Parametro di esplorazione (epsilon-greedy)
-epsilon = 0.1;
+epsilon = 0.8;
 % Parametro di sconto 
 gamma = 1;
 % Parametro di aggiornamento 
 alpha = 1e-2;
 
 % Dimensione dello spazio degli stati
-POS = [0, 50];
+POS = [0, 50*50];
 DIR = [1, 4];
 
 numrow = 50;
 numcol = 50;
 
 % intorno nel quale generiano testa serpente rispetto a target
-offset = 5;
+offset = 1;
 M = 5; % numero di celle per griglia
 N = 10; % numero di griglie
 
 % Dimensione del vettore dei pesi
-d = (M+1)^4 * N;
+d = (M+1)^6 * N;
 
 % funzione qualita (azioni, lunghezza del serpente)
 % 
 % Q = zeros(A,5);
 % Inizializzazione del vettore dei pesi con valori casuali
-w = randn(d, A);
+% w = randn(d, A);
 
 % Creazione griglie
 [cellPOS, cellDIR] = griglie(POS, DIR, M, N);
@@ -45,20 +45,20 @@ w = randn(d, A);
 % Colori per il grafico
 plotColors = lines(N);
 % Stampiamo a schermo le griglie
-figure(1)
-hold on
-for i = 1:N
-    for j = 1:M+2
-        plot([cellPOS(i,j), cellPOS(i,j)], DIR, 'Color', plotColors(i,:));
-        plot(POS, [cellDIR(i,j), cellDIR(i,j)], 'Color', plotColors(i,:));
-    end
-end
-xlim(POS)
-ylim(DIR)
+% figure(1)
+% hold on
+% for i = 1:N
+%     for j = 1:M+2
+%         plot([cellPOS(i,j), cellPOS(i,j)], DIR, 'Color', plotColors(i,:));
+%         plot(POS, [cellDIR(i,j), cellDIR(i,j)], 'Color', plotColors(i,:));
+%     end
+% end
+% xlim(POS)
+% ylim(DIR)
 
 
-muro_min = 25;
-muro_max = 75;
+muro_min = 15;
+muro_max = 34;
 % Inizializzazione del rendimento totale
 G = zeros(numEpisodes, 1);
 
@@ -98,19 +98,21 @@ end
 %     end
 % end
 
-
+% history_morso = [];
+% history_azione = zeros(A,1);
+% history_muro = [];
 %%%%% EPISODI %%%%%
 
 for e = 1:numEpisodes
-    fprintf("Episodio ->");
-    disp(e)
-    
+    fprintf("\n\nEPISODIO -> %d\n",e);
+    % disp(e)
+    morso = 0;
     %%%%% posizione iniziale serpente %%%%%
     % stato: posizione iniziale, direzione iniziale (3) e target
-    s = {pos_ini, 3, indtarget}
+    s = {pos_ini, rand(A), indtarget};
     
     % feature dello stato iniziale
-    Fac = get_features(s, cellPOS, cellDIR, M, N);
+    Fac = get_features2(s, cellPOS, cellDIR, M, N);
     
     % Funzione qualità della testa
     % creiamo la funzine qualita sulla base del vettore dei pesi
@@ -125,7 +127,8 @@ for e = 1:numEpisodes
     else
         a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
     end
-
+    
+    
     % inizializzazione
     isTerminal = false;
 
@@ -133,7 +136,9 @@ for e = 1:numEpisodes
     while true
         % esegue l'azione a e osserva il nuovo stato sp e la ricompensa r
         % disp(a)
+        history_azione(a) =  history_azione(a) +1;
         [sp, r] = modello_snake_50x50(s, a, POS, DIR,e, point);
+        
         % aggiornamento ritorno
         G(e) = G(e) + r;
 
@@ -142,12 +147,13 @@ for e = 1:numEpisodes
            
             delta = r - sum(w(Fac,a));
             point = point+1;
-            fprintf("punteggio: ");
-            disp(point)
-           
+            fprintf("punteggio: %d\n", point);
+            % disp(point)
+            fprintf("si è morso %d volte\n", morso);
+            history_morso = [history_morso morso];
         else
             % features dello stato successivo
-            Facp = get_features(sp, cellPOS, cellDIR, M, N);
+            Facp = get_features2(sp, cellPOS, cellDIR, M, N);
             % calcolo della funzione qualità per lo stato successivo
 
             % Qp = sum(w(fac1,:));
@@ -167,7 +173,11 @@ for e = 1:numEpisodes
 
             if r == -5 %%% il serpente si è morso %%%
                 point = 0;
-                sp = {pos_ini, 3, indtarget};
+                morso = morso+1;
+                % fprintf("si è morso %d\n",morso)
+                sp = {pos_ini, rand(A), indtarget};
+
+
                 % corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
                 % locx = corpo(:,1);
                 % locy = corpo(:,2);
@@ -190,10 +200,10 @@ for e = 1:numEpisodes
             % Posizione casuale per il target
             indtarget = genera_target50x50(muro_min, muro_max, numcol,numrow);
             [tx,ty] = ind2sub([numrow, numcol], indtarget);
+            
             corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
             locx = corpo(:,1);
             locy = corpo(:,2);
-            
             
             for i = 1:len_snake
                 pos_ini(i) = sub2ind([numrow numcol], locx(i), locy(i));
@@ -207,10 +217,18 @@ for e = 1:numEpisodes
     end
 end
 %%
-save qualita.mat Q w
+save qualita.mat Q w history_morso history_muro history_azione
 %% plot return per episode
-figure(3)
+figure(2)
 plot(G, 'LineWidth',2)
+
+%% plot stattistiche
+figure(3)
+bar(history_azione);
+
+figure(4)
+plot(history_morso);
+%%
 
 % %% plot optimal value function
 % % define a grid

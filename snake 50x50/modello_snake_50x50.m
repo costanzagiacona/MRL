@@ -119,7 +119,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     if mod(e,gg)==0
         % pause(t/5);
         %%% AMBIENTE %%%
-        figure(5)
+        figure(1)
         clf
         title(['episodio ' , num2str(e), ' punteggio: ', num2str(point)]);
         axis equal
@@ -146,22 +146,22 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
         %%% MURI INTERNI %%%
         % segmenti verticali ----
         % basso destra 
-        rectangle('Position',[35,15,1,6], 'FaceColor','b');
+        rectangle('Position',[34,15,1,5], 'FaceColor','b');
         % alto a destra 
-        rectangle('Position',[35,30,1,6], 'FaceColor','b');
+        rectangle('Position',[34,30,1,5], 'FaceColor','b');
         % basso sinistra 
-        rectangle('Position',[15,15,1,6], 'FaceColor','b');
+        rectangle('Position',[15,15,1,5], 'FaceColor','b');
         % alto sinistra 
-        rectangle('Position',[15,30,1,6], 'FaceColor','b');
+        rectangle('Position',[15,30,1,5], 'FaceColor','b');
         % segmenti orizzontali ----
         % alto a sinistra
-        rectangle('Position',[15,35,6,1], 'FaceColor','b');
+        rectangle('Position',[15,34,5,1], 'FaceColor','b');
         % alto a destra
-        rectangle('Position',[30,35,6,1], 'FaceColor','b');
+        rectangle('Position',[30,34,5,1], 'FaceColor','b');
         % basso sinistra
-        rectangle('Position',[15,15,6,1], 'FaceColor','b');
+        rectangle('Position',[15,15,5,1], 'FaceColor','b');
         % alto sinistra
-        rectangle('Position',[30,15,6,1], 'FaceColor','b');
+        rectangle('Position',[30,15,5,1], 'FaceColor','b');
         
         %%% SERPENTE %%%
         disegno_snake(locx, locy);
@@ -180,7 +180,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     %%%%%%%  se il serpente si morde la coda %%%%%%%
     if sum((locx(2:end)==locx(1)) & (locy(2:end)==locy(1))) 
        
-      game_over(e);
+      game_over(e,gg);
        
        % è uno stato terminale 
        r = -5;
@@ -191,7 +191,7 @@ function [sp, r] = modello_snake_2 (s, a, POS, DIR,  e, point)
     elseif variabile == true
         % fprintf("muro toccato")
         
-        game_over(e);
+        game_over(e,gg);
         
         pause(1);
         % disp(100)

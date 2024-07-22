@@ -1,8 +1,8 @@
 %% GAME OVER
 % mostra a schermo la scritta GAME OVER
-function game_over(e)
+function game_over(e,gg)
 %e -> episodio attuale
-    if mod(e,1)==0
+    if mod(e,gg)==0
         % fprintf("game over")
         str = 'GAME OVER!';
         dim = [.1 .4 .7 .7];
