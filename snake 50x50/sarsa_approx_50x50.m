@@ -62,6 +62,7 @@ muro_max = 34;
 % Inizializzazione del rendimento totale
 G = zeros(numEpisodes, 1);
 
+global num_tested;
 
 %%%%%  posizione iniziale del serpente %%%%%
 len_snake = 5;
@@ -110,7 +111,15 @@ for e = 1:numEpisodes
     muro = 0;
     %%%%% posizione iniziale serpente %%%%%
     % stato: posizione iniziale, direzione iniziale (3) e target
-    s = {pos_ini, rand(A), indtarget};
+    num_tested = 0;
+
+    %%%%% azione epsilon greedy %%%%%
+    if rand < epsilon
+        a = randi(A); % azone random 
+    else
+        a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
+    end
+    s = {pos_ini, a, indtarget};
     
     % feature dello stato iniziale
     Fac = get_features2(s, cellPOS, cellDIR, M, N);
@@ -121,14 +130,6 @@ for e = 1:numEpisodes
     Q = sum(w(Fac,:));
     
     % aggiorniamo il vattore dei pesi delle features attive
-
-    %%%%% azione epsilon greedy %%%%%
-    if rand < epsilon
-        a = randi(A); % azone random 
-    else
-        a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
-    end
-    
     
     % inizializzazione
     isTerminal = false;
@@ -201,8 +202,12 @@ for e = 1:numEpisodes
         else
             % Posizione casuale per il target
             indtarget = genera_target50x50(muro_min, muro_max, numcol,numrow);
-            [tx,ty] = ind2sub([numrow, numcol], indtarget);
+            % [tx,ty] = ind2sub([numrow, numcol], indtarget);
+            % tx = 18;
+            % ty = 32;
+            indtarget = sub2ind([numrow, numcol], tx, ty);
             
+            num_tested = 0;
             corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
             locx = corpo(:,1);
             locy = corpo(:,2);

@@ -31,6 +31,8 @@ function [sp, r, muro] = modello_snake_50x50 (s, a, POS, DIR, e, point, muro, mu
     locy = zeros(1, 5);
 
     gg = 100;
+
+    global num_tested;
     %% Calcolo la posizione e configurazione attuale del serpente dallo stato s %%
     
     %posizione serpente
@@ -190,6 +192,7 @@ function [sp, r, muro] = modello_snake_50x50 (s, a, POS, DIR, e, point, muro, mu
     elseif variabile == true
         % fprintf("muro toccato")
         muro = muro + 1;
+        num_tested = 0;
         game_over(e,gg);
         
         pause(1);
