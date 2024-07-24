@@ -118,7 +118,8 @@ function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow
             end
         end
     end
-
+    testa_x
+    testa_y
     % generiamo tutte le possibili configurazioni
     [count, configurations] = configurazioni(5);
 
@@ -158,7 +159,7 @@ function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow
         valido = true;
         for i = 2:size(corpo, 1)
             test = controllo_muro50x50(corpo(i,1), corpo(i,2), muro_min, muro_max, numcol, numrow);
-            if test == true || (corpo(i,1) == tx && corpo(i,2) == ty)
+            if test == true || (corpo(i,1) == tx && corpo(i,2) == ty) || (corpo(i,1)==corpo(1,1) && corpo(i,2)==corpo(1,2)) 
                 valido = false;
                 break;
             end

@@ -105,10 +105,10 @@ punteggio = [];
 %%%%% EPISODI %%%%%
 
 for e = 1:numEpisodes
-    % fprintf("\n\nEPISODIO -> %d\n",e);
-    if mod(e,50) ==0
-        disp(e)
-    end
+    fprintf("\n\nEPISODIO -> %d\n",e);
+    % if mod(e,50) ==0
+    %     % disp(e)
+    % end
     
     morso = 0;
     muro = 0;
@@ -131,6 +131,12 @@ for e = 1:numEpisodes
     % creiamo la funzine qualita sulla base del vettore dei pesi
     
     Q = sum(w(Fac,:));
+
+    if rand < epsilon
+        a = randi(A); % azone random 
+    else
+        a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
+    end
     
     % aggiorniamo il vattore dei pesi delle features attive
     
@@ -154,8 +160,8 @@ for e = 1:numEpisodes
             point = point+1;
             fprintf("punteggio: %d\n", point);
             % disp(point)
-            % fprintf("si è morso %d volte\n", morso);
-            % fprintf("ha sbattuto %d volte\n", muro);
+            fprintf("si è morso %d volte\n", morso);
+            fprintf("ha sbattuto %d volte\n", muro);
             punteggio = [punteggio point];
             history_morso = [history_morso morso];
         else

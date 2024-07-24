@@ -30,7 +30,7 @@ function [sp, r, muro] = modello_snake_50x50 (s, a, POS, DIR, e, point, muro, mu
     locx = zeros(1, 5);
     locy = zeros(1, 5);
 
-    gg = 100;
+    gg = 50;
 
     global num_tested;
     %% Calcolo la posizione e configurazione attuale del serpente dallo stato s %%
