@@ -10,7 +10,7 @@ load qualita.mat
 % Numero di azioni
 A = 4;
 % Numero di episodi
-numEpisodes = 1e3;
+numEpisodes = 1e6;
 % Parametro di esplorazione (epsilon-greedy)
 epsilon = 0.8;
 % Parametro di sconto 
@@ -26,7 +26,7 @@ numrow = 50;
 numcol = 50;
 
 % intorno nel quale generiano testa serpente rispetto a target
-offset = 1;
+offset = 2;
 M = 5; % numero di celle per griglia
 N = 10; % numero di griglie
 
@@ -98,15 +98,18 @@ end
 %         break;
 %     end
 % end
-
+punteggio = [];
 % history_morso = [];
 % history_azione = zeros(A,1);
 % history_muro = [];
 %%%%% EPISODI %%%%%
 
 for e = 1:numEpisodes
-    fprintf("\n\nEPISODIO -> %d\n",e);
-    % disp(e)
+    % fprintf("\n\nEPISODIO -> %d\n",e);
+    if mod(e,50) ==0
+        disp(e)
+    end
+    
     morso = 0;
     muro = 0;
     %%%%% posizione iniziale serpente %%%%%
@@ -151,8 +154,9 @@ for e = 1:numEpisodes
             point = point+1;
             fprintf("punteggio: %d\n", point);
             % disp(point)
-            fprintf("si è morso %d volte\n", morso);
-            fprintf("ha sbattuto %d volte\n", muro);
+            % fprintf("si è morso %d volte\n", morso);
+            % fprintf("ha sbattuto %d volte\n", muro);
+            punteggio = [punteggio point];
             history_morso = [history_morso morso];
         else
             % features dello stato successivo
@@ -177,8 +181,15 @@ for e = 1:numEpisodes
             if r == -5 %%% il serpente si è morso %%%
                 point = 0;
                 morso = morso+1;
+                % Q = sum(w(Fac,:));
+                % if rand < epsilon
+                %     a = randi(A); % azone random 
+                % else
+                %     a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
+                % end
                 % fprintf("si è morso %d\n",morso)
-                sp = {pos_ini, rand(A), indtarget};
+                sp = {pos_ini,randi(A), indtarget};
+                
 
 
                 % corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
@@ -202,10 +213,10 @@ for e = 1:numEpisodes
         else
             % Posizione casuale per il target
             indtarget = genera_target50x50(muro_min, muro_max, numcol,numrow);
-            % [tx,ty] = ind2sub([numrow, numcol], indtarget);
+            [tx,ty] = ind2sub([numrow, numcol], indtarget);
             % tx = 18;
             % ty = 32;
-            indtarget = sub2ind([numrow, numcol], tx, ty);
+            % indtarget = sub2ind([numrow, numcol], tx, ty);
             
             num_tested = 0;
             corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
@@ -220,15 +231,15 @@ for e = 1:numEpisodes
         end       
     end
 
-    if mod(e,20) == 0
-        epsilon = epsilon*0.9;
+    if mod(e,100) == 0
+        epsilon = epsilon*0.9
         if epsilon < 0.01
-            epsilon = 0.8;
+            epsilon = 0.4;
         end
     end
 end
 %%
-save qualita.mat Q w history_morso history_muro history_azione
+save qualita.mat Q w history_morso history_muro history_azione punteggio
 %% plot return per episode
 figure(2)
 plot(G, 'LineWidth',2)
@@ -245,6 +256,10 @@ title('Frequenza con cui si morde')
 figure(5)
 plot(history_muro);
 title('Frequenza con cui colpisce il muro')
+
+figure(6)
+title('punteggio')
+plot(punteggio)
 %%
 
 % %% plot optimal value function

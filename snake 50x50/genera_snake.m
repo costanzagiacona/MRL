@@ -165,7 +165,7 @@ function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow
         end
 
         % Stampare se la configurazione è valida o meno
-        fprintf('Valido: %d\n', valido);
+        % fprintf('Valido: %d\n', valido);
         
         if valido
             break;
