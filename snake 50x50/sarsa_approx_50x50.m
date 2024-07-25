@@ -16,7 +16,7 @@ epsilon = 0.8;
 % Parametro di sconto 
 gamma = 1;
 % Parametro di aggiornamento 
-alpha = 1e-2;
+alpha = 2e-2;
 
 % Dimensione dello spazio degli stati
 POS = [0, 50*50];
@@ -35,7 +35,7 @@ d = (M+1)^6 * N;
 
 % funzione qualita (azioni, lunghezza del serpente)
 % 
-% Q = zeros(A,5);
+Q = zeros(A,1);
 % Inizializzazione del vettore dei pesi con valori casuali
 % w = randn(d, A);
 
@@ -80,7 +80,7 @@ point = 0;
 % Posizione casuale per il target
 indtarget = genera_target50x50(muro_min, muro_max, numcol,numrow);
 [tx,ty] = ind2sub([numrow, numcol], indtarget);
-corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
+[corpo,aprev] = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
 locx = corpo(:,1);
 locy = corpo(:,2);
 
@@ -98,7 +98,7 @@ end
 %         break;
 %     end
 % end
-punteggio = [];
+% punteggio = [];
 % history_morso = [];
 % history_azione = zeros(A,1);
 % history_muro = [];
@@ -106,9 +106,9 @@ punteggio = [];
 
 for e = 1:numEpisodes
     fprintf("\n\nEPISODIO -> %d\n",e);
-    % if mod(e,50) ==0
-    %     % disp(e)
-    % end
+    if mod(e,100) ==0
+        disp(e)
+    end
     
     morso = 0;
     muro = 0;
@@ -117,12 +117,12 @@ for e = 1:numEpisodes
     num_tested = 0;
 
     %%%%% azione epsilon greedy %%%%%
-    if rand < epsilon
-        a = randi(A); % azone random 
-    else
-        a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
-    end
-    s = {pos_ini, a, indtarget};
+    % if rand < epsilon
+    %     a = randi(A); % azone random 
+    % else
+    %     a = find(Q == max(Q), 1, 'first'); % azione greedy rispetto a Q
+    % end
+    s = {pos_ini, aprev, indtarget};
     
     % feature dello stato iniziale
     Fac = get_features2(s, cellPOS, cellDIR, M, N);
@@ -150,12 +150,11 @@ for e = 1:numEpisodes
         history_azione(a) =  history_azione(a) + 1;
         [sp, r, muro] = modello_snake_50x50(s, a, POS, DIR, e, point, muro, muro_min, muro_max);
         history_muro = [history_muro muro];
-
         % aggiornamento ritorno
         G(e) = G(e) + r;
 
         % STATO TERMINALE
-        if r == 5 %%% target preso %%%
+        if r == 10 %%% target preso %%%
             delta = r - sum(w(Fac,a));
             point = point+1;
             fprintf("punteggio: %d\n", point);
@@ -184,7 +183,7 @@ for e = 1:numEpisodes
             % calcolo errore delle differenza temporali
             delta = r + gamma*Qp(ap) - sum(w(Fac,a));
 
-            if r == -5 %%% il serpente si è morso %%%
+            if r == -10 %%% il serpente si è morso %%%
                 point = 0;
                 morso = morso+1;
                 % Q = sum(w(Fac,:));
@@ -211,7 +210,7 @@ for e = 1:numEpisodes
         % aggiornamento vettore dei pesi
         w(Fac,a) = w(Fac,a) + alpha*delta;
         
-        if r ~= 5 %stato non terminale
+        if r ~= 10 %stato non terminale
         % aggiornamento stato, azione e features
         s = sp;
         a = ap;
@@ -220,12 +219,12 @@ for e = 1:numEpisodes
             % Posizione casuale per il target
             indtarget = genera_target50x50(muro_min, muro_max, numcol,numrow);
             [tx,ty] = ind2sub([numrow, numcol], indtarget);
-            % tx = 18;
-            % ty = 32;
+            % tx = 16;
+            % ty = 16;
             % indtarget = sub2ind([numrow, numcol], tx, ty);
             
             num_tested = 0;
-            corpo = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
+            [corpo, aprev] = genera_snake(tx,ty, offset, muro_min, muro_max, numcol, numrow);
             locx = corpo(:,1);
             locy = corpo(:,2);
             
@@ -239,21 +238,26 @@ for e = 1:numEpisodes
 
     if mod(e,100) == 0
         epsilon = epsilon*0.9
-        if epsilon < 0.01
-            epsilon = 0.4;
+        if epsilon < 0.08
+            epsilon = 0.5;
         end
     end
 end
 %%
-save qualita.mat Q w history_morso history_muro history_azione punteggio
+save qualita_new.mat Q w  history_morso history_muro history_azione punteggio 
 %% plot return per episode
 figure(2)
 plot(G, 'LineWidth',2)
-
+title('Guadagno')
 %% plot stattistiche
 figure(3)
-bar(history_azione);
+clr = [177,162,202; 
+    139,211,230; 
+    255,109,106;
+    239,190,125] / 255;
+b = bar(history_azione,'FaceColor','flat');
 title('Preferenza azioni')
+b.CData = clr;
 
 figure(4)
 plot(history_morso);
@@ -264,8 +268,8 @@ plot(history_muro);
 title('Frequenza con cui colpisce il muro')
 
 figure(6)
-title('punteggio')
 plot(punteggio)
+title('punteggio')
 %%
 
 % %% plot optimal value function

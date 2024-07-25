@@ -98,7 +98,7 @@
         
 % end
 
-function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow)
+function [corpo,a] = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow)
 % tx, ty -> posizione target
 % offset -> dimensione intorno
 % muro_min, muro_max -> posizioni muro sulla griglia
@@ -118,8 +118,8 @@ function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow
             end
         end
     end
-    testa_x
-    testa_y
+    % testa_x
+    % testa_y
     % generiamo tutte le possibili configurazioni
     [count, configurations] = configurazioni(5);
 
@@ -189,4 +189,27 @@ function corpo = genera_snake(tx, ty, offset, muro_min, muro_max, numcol, numrow
             corpo(i,2) = numrow + corpo(i,2);
         end
     end
+    % testa_x
+    % testa_y
+    % corpo(2,2)
+    % corpo(2,2)
+    % calcolo azione precedente
+    if testa_x == corpo(2,1) && testa_y >= corpo(2,2)
+        a = 4;
+    elseif testa_x == corpo(2,1) && testa_y < corpo(2,2)
+        a = 3;
+    elseif testa_y == corpo(2,2) && testa_x >= corpo(1,2)
+        a = 1;
+    elseif testa_y == corpo(2,2) && testa_x < corpo(1,2)
+        a = 2;
+    end
 end
+
+
+
+
+
+
+
+
+
