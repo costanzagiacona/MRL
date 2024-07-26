@@ -9,7 +9,7 @@ A = 4;
 % numero di episodi
 numEpisodes = 1e6;
 % foresight parameter
-gamma = 1;
+gamma = 0.99;
 % definizione lambda
 lambda = 0.1;
 
@@ -173,7 +173,7 @@ for e = 1:numEpisodes
             error('w contiene NaN');
         end
 
-        Qold = QQp;
+        Qold = QQ;
         Fac = Facp;
 
         if r == 5
@@ -225,7 +225,6 @@ clr = [177,162,202;
     139,211,230; 
     255,109,106;
     239,190,125] / 255;
-history_azione = history_azione + history_azione_1
 b = bar(history_azione,'FaceColor','flat');
 title('Preferenza azioni')
 b.CData = clr;
