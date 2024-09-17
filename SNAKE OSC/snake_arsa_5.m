@@ -232,4 +232,4 @@ hold off;
 
 
 %%
-save qualita6.mat Q history_A history_m punteggio states count_a
+save qualita6.mat Q history_A history_m punteggio states count_a 
