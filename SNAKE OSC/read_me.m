@@ -23,7 +23,7 @@
 
 %% ARGORITMO SARSA
     % è un algortimo temporal difference on-policy, in cui stimiamo
-    % durettamente la funzione qualità, invece della funzione valore. 
+    % direttamente la funzione qualità, invece della funzione valore. 
     % è un algoritmo model-free, non conosciamo l'ambiente.
     % l'algoritmo è descritto dai seguenti passi:
     %   - ci troviamo in uno stato
@@ -40,6 +40,7 @@
     %   - la frequenza della scelta delle azioni
     %   - il numero di volte che si morde la coda per ogni episodio
     %   - l'andamento del punteggio
+    %   - quante volte è stato visitato ogni stato
 
 
 

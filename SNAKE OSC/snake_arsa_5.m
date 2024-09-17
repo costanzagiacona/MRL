@@ -1,19 +1,19 @@
 %% SERPENTE LUNGHEZZA 5
 
-% clear all
+clear all
 close all
 clc
-% qualita.mat contiene la funzioone qualita addestrando l'algorimo con
-% reword 10 se otteniamo il taeget, -1 per ogni passo e -1 se si mangia
-load qualita5.mat
-% load qualita_multi_target.mat
+% qualita.mat contiene la funzione qualita addestrando l'algorimo con
+% reward 10 se otteniamo il target, -1 per ogni passo e -5 se si morde
+% load qualita5.mat
+load qualita6.mat
 
-% inizializziamo i paramtri per l'algoritmo SARSA
+% inizializziamo i parametri per l'algoritmo SARSA
 gamma = 1;
-alpha = 1e-2;
-% numEpisodes = 1e7;
+% alpha = 1e-1;
+alpha = 0.5;
 numEpisodes = 1e4;
-epsilon = 0.5;
+epsilon = 0.8;
 
 % definiao le dimesioni della griglia di gioco
 numrow = 8;
@@ -25,40 +25,34 @@ target_y = 8;
 
 gg = 10;
 
-% i vari stati del serpente dipendono dalla posizione della testa e la
-% configurazione del corpo, e dalla posizione del target
+% i vari stati del serpente dipendono dalla posizione della testa, dalla
+% configurazione del corpo e dalla posizione del target
 [conf_snake,conf] = count_snake_configurations(5);
 S = numrow*numcol*conf_snake*target_x*target_y;
-% le azioni possibii da prendere sono quattro:
+% le azioni possibili sono quattro:
 % UP, DOWN, LEFT, RIGHT
 A = 4;
 % tic
-% contatore azioni
-count_a = zeros(4, 1);
-% history_A = zeros(A, numEpisodes);
-% contatore per quando il serpente si morde da solo
-count_m = 0;
-% history_M = zeros(1, numEpisodes);
-% storico dei punteggi
-history_P = zeros(1, numEpisodes);
-% contatore per tenere traccia di quando il serpente muore da usare nel
-% punteggio
-count_m_p = 0;
 
-% initialize Q function
-% Q = zeros(S, A);
+% Contatori
+% count_a = zeros(4, 1);              % contatore azioni
+count_m = 0;                        % contatore per quando il serpente si morde da solo
+count_m_p = 0;                      % contatore per quando il serpente muore da usare nel punteggio
+point = 0;                          % contatore punti
+point_tot = 0;                      % andamento del punteggio
+
+% Statistiche 
+% history_M = zeros(1, numEpisodes);        % storico frequenza morsi
+% history_P = zeros(1, numEpisodes);        % storico dei punteggi
+% history_m = [];
 % punteggio = [];
-% contiamo i punti
-point = 0;
-% andamento del punteggio
-point_tot = 0;
+% history_A = zeros(A, numEpisodes);
+% states = zeros(1, S);                     % vettore degli stati
+% 
+% Q = zeros(S, A);    % initialize Q function
 
-% vettore degli stati
-% states = zeros(1, S);
-
-%epsilon = 0;
 % iterazione ricorsiva per ogni episodio
-for e = 1 :numEpisodes
+for e = 1:numEpisodes
     count_m = 0; % ad ogni episodio azzero il contatore
     % disp(e)
     if mod(e,gg) == 0
@@ -67,11 +61,11 @@ for e = 1 :numEpisodes
     % definiamo la posizione iniziale serpente
     locx = [5 5 5 5 5]; % coordinate orizzontali
     locy = [4 5 6 7 8]; % coordinate verticali
-    aprev = 3; % inizializziamo al direzione iniziale, visto 
-               % l'orientamento iniziale del serpente, sccegliamo sempre sotto 
+    aprev = 3; % inizializziamo la direzione iniziale, visto 
+               % l'orientamento iniziale del serpente, scegliamo sempre sotto 
     
-    % calcoliamo la configurazione del serpente, da confrontare con a la lista
-    % che abbiamo a disposizione. La testa del serpente si trova sempre im
+    % calcoliamo la configurazione del serpente, da confrontare con la lista
+    % che abbiamo a disposizione. La testa del serpente si trova sempre in
     % posizione (0,0)
     loc_cfx = locx - locx(1);
     loc_cfy = locy - locy(1);
@@ -81,22 +75,21 @@ for e = 1 :numEpisodes
               loc_cfx(4) loc_cfy(4);
               loc_cfx(5) loc_cfy(5)];
     j = 1;
-    % confontiamo al configurazione ottenuta con la lista, fino a quando non
+    % confontiamo la configurazione ottenuta con la lista, fino a quando non
     % troviamo una uguaglianza
     while true
         if config == conf{j}
             break;
         else 
-
             j = j+1;
         end
     end
 
     % definiamo il target che il serpente deve colpire
     % iteriamo fino a quando il target non appare in una posizione accettabile,
-    % ossia fino a quando l target non ha le stesse coordianate del serpente
+    % ossia fino a quando il target ha coordinate diverse dal serpente
     while(1)
-        %posizione target
+        % posizione target
         % randperm genera un numero casuale preso tra 1 e size(mat_r)
         tx = randperm(numrow,1); % coordinata casuale x
         ty = randperm(numcol,1); % coordinata casuale y
@@ -119,31 +112,25 @@ for e = 1 :numEpisodes
         a = epsgreedy(Q, s, A, epsilon);
         
         % CALCOLIAMO LO STATO SUCCESSIVO E IL REWARD
-        [sp, r, ap, count_a, count_m] = snake_model_5(s, a, aprev,e, conf, point, count_a, count_m);
+        [sp, r, ap, count_a, count_m] = snake_model_5(s, a, aprev, e, conf, point, count_a, count_m);
         count_m_p = count_m_p + count_m;
 
         % pause(0.1)
         % se lo stato successivo è -1, il serpente si è morso la cosa allora viene 
-        % ri-inizializzato in uno stato iniziale, e riacalcolata la configurazione
+        % ri-inizializzato in uno stato iniziale, e ricalcolata la configurazione
         % iniziale
         if sp == -1 
             % history_P(1, e) = point_tot;
             point = 0;
-            % 
-            % if (punteggio(length(punteggio))~=0)
             punteggio = [punteggio, 0];
-            % end
+            history_m = [history_m count_m];
             point_tot = point_tot + point;
-            
-            % % if the next state is terminal Q(sp,ap) = 0
-            % Q(s,a) = Q(s,a) + alpha*(r - Q(s,a)); %s(1) ci serve l testa
-            %serpente ritorna nella posizione iniziale 
-            %posizione iniziale serpente
-            locx = [5 5 5 5 5]; %pos orizzontale
-            locy = [4 5 6 7 8]; %pos verticale
-            aprev = 3; %verso il basso
+            % serpente ritorna nella posizione iniziale 
+            locx = [5 5 5 5 5]; % pos orizzontale
+            locy = [4 5 6 7 8]; % pos verticale
+            aprev = 3; % verso il basso
             % traduco le coordinate del serpente rispetto alla testa, per determinare
-            % la onfigurazione
+            % la configurazione
             loc_cfx = locx - locx(1);
             loc_cfy = locy - locy(1);
             config = [loc_cfx(1) loc_cfy(1);
@@ -152,7 +139,7 @@ for e = 1 :numEpisodes
                     loc_cfx(4) loc_cfy(4);
                     loc_cfx(5) loc_cfy(5)];
             j = 1;
-            % determio l'indice della configurazione
+            % determino l'indice della configurazione
             while true
                 if config == conf{j}
                     break;
@@ -160,14 +147,15 @@ for e = 1 :numEpisodes
                     j = j+1;
                 end
             end
+
             % disp('s = -1, ricalcolo nuovo stato iniziale')
             s = sub2ind([numrow numcol conf_snake,target_x, target_y], locx(1), locy(1), j, tx, ty);
             
             % break;
             % disp("HO MANGiato me stesso");
-        % se il serpente non si è morso la cosa, allora o ha raggiunto il target
+        % se il serpente non si è morso la coda, allora o ha raggiunto il target
         % e quindi uno STATO TERMINALE
-        % altrimenti viene aggiornata la funzione qualita e l serpente continua il
+        % altrimenti viene aggiornata la funzione qualita e il serpente continua il
         % suo pecorso
         else
             states(sp) = states(sp)+1;
@@ -182,68 +170,66 @@ for e = 1 :numEpisodes
                 break;
                 
             else
-                % stiamo il valore della funzione qualità
-                
+                % stimo il valore della funzione qualità        
                 Qp = (1-epsilon)*max(Q(sp,:)) + epsilon/A*sum(Q(sp,:));
-                % aggiorniamo la funzione qualita, attravverso la legge di aggiornamento SARSA
+                % aggiorniamo la funzione qualita, attraverso la legge di aggiornamento SARSA
                 Q(sp,a) = Q(sp,a) + alpha*(r + gamma*Qp - Q(sp,a));
                 % andiamo al prossimo stato salvando l'azione precedente
                 s = sp;
                 aprev = ap; 
                 % add state to history
-                H = [H, s];
+                % H = [H, s];
             end
         end
 
     end
 
-    if mod(e, 100) == 0
-         
-        epsilon = epsilon*0.9; %diminuisco epsilon
+    if mod(e, 1000) == 0
+        epsilon = epsilon*0.9; % diminuisco epsilon
     end
-    history_A(:, e) = count_a;
-    history_M(1, e) = count_m;
+    % history_A(:, e) = count_a;
+    % history_M(1, e) = count_m;
     % history_P(1, e) = point-1;
 end
-
-%% 
-figure(2)
-surf(Q)
-% % 
-% figure
-% plot(H)
 
 %% Grafico per visualizzare quante volte prendiamo ciascuna azione
 figure(3)
 subplot(3,1,1)
 plot(history_A','LineWidth',2)
+% xlim([0, e]);
 title("Frequenza di scelta delle azioni")
 legend('Destra', 'Sinistra', 'Basso', 'Alto')
 
 % Grafico per visualizzare quante volte il serpente si morde la coda
 subplot(3,1,2)
-plot(history_M','LineWidth',2)
+plot(history_m,'LineWidth',2)
 title("Frequenza con cui il serpente si morde la coda")
-
+ 
 % Grafico per visualizzare il punteggio
 subplot(3,1,3)
 % plot(history_P','LineWidth',2)
-plot(punteggio','LineWidth',2)
+plot(punteggio','LineWidth', 2) 
 title("Storico punteggio")
-%%
+
 figure(4)
 bar(states, 30)
 
 %%
-save qualita5.mat Q history_A history_M punteggio states
+figure(5)
+episodes = 1:length(punteggio);                                  
+degree = 3;  
+[coefficients, S, mu] = polyfit(episodes, punteggio, degree);  % Fit con centering e scaling
+polynomial_fit = polyval(coefficients, episodes, [], mu);      % Valuta il polinomio con i dati scalati
+
+hold on;
+plot(episodes, polynomial_fit, '-r', 'LineWidth', 2); % Curva di fit polinomiale
+xlabel('Episodi');
+ylabel('Punteggio');
+title('Andamento crescente del punteggio con fit polinomiale');
+grid on;
+legend('Fit Polinomiale');
+hold off;
 
 
-
-
-
-
-
-
-
-
-
+%%
+save qualita6.mat Q history_A history_m punteggio states count_a
