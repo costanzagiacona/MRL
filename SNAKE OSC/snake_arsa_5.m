@@ -12,7 +12,7 @@ load qualita6.mat
 gamma = 1;
 % alpha = 1e-1;
 alpha = 0.5;
-numEpisodes = 1e4;
+numEpisodes = 1e6;
 epsilon = 0.8;
 
 % definiao le dimesioni della griglia di gioco
