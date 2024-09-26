@@ -118,7 +118,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
     % % funzione che aggiorna la posizione del serpente
     % disegno_snake( locx, locy);
 
-    pause(t/4);
+    % pause(t/4);
     % color = ['m', 'b'];
     if mod(e,gg)==0
         % creo la figura su cui disegnare l'ambiente e il serpente

@@ -23,7 +23,7 @@ numcol = 8;
 target_x = 8;
 target_y = 8;
 
-gg = 10;
+gg = 1000;
 
 % i vari stati del serpente dipendono dalla posizione della testa, dalla
 % configurazione del corpo e dalla posizione del target
@@ -186,6 +186,9 @@ for e = 1:numEpisodes
 
     if mod(e, 2000) == 0
         epsilon = epsilon*0.9; % diminuisco epsilon
+        if epsilon <= 0.5
+            epsilon = 0.8;
+        end
     end
     % history_A(:, e) = count_a;
     % history_M(1, e) = count_m;
@@ -214,18 +217,42 @@ title("Storico punteggio")
 figure(4)
 bar(states, 30)
 
+figure(1)
+clr = [177,162,202; 
+    139,211,230; 
+    255,109,106;
+    239,190,125] / 255;
+b = bar(1:A, count_a,'FaceColor','flat');
+title('Preferenza azioni')
+b.CData = clr;
+
 %%
 figure(5)
+subplot(2,1,1)
 episodes = 1:length(punteggio);                                  
-degree = 4;  
-[coefficients, S, mu] = polyfit(episodes, punteggio, degree);  % Fit con centering e scaling
+degree = 3;  
+[coefficients, ~, mu] = polyfit(episodes, punteggio, degree);  % Fit con centering e scaling
 polynomial_fit = polyval(coefficients, episodes, [], mu);      % Valuta il polinomio con i dati scalati
 
 hold on;
 plot(episodes, polynomial_fit, '-r', 'LineWidth', 2); % Curva di fit polinomiale
 xlabel('Episodi');
 ylabel('Punteggio');
-title('Andamento crescente del punteggio con fit polinomiale');
+title('Andamento del punteggio');
+grid on;
+legend('Fit Polinomiale');
+hold off;
+
+subplot(2,1,2)
+ep = 1:length(history_m);  
+[coefficients, S, mu] = polyfit(ep, history_m, degree);  % Fit con centering e scaling
+polynomial_fit = polyval(coefficients, episodes, [], mu);      % Valuta il polinomio con i dati scalati
+
+hold on;
+plot(episodes, polynomial_fit, '-k', 'LineWidth', 2); % Curva di fit polinomiale
+xlabel('Episodi');
+ylabel('Punteggio');
+title('Andamento con cui il serpente si morde');
 grid on;
 legend('Fit Polinomiale');
 hold off;
