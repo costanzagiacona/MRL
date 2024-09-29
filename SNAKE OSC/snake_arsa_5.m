@@ -6,13 +6,13 @@ clc
 % qualita.mat contiene la funzione qualita addestrando l'algorimo con
 % reward 10 se otteniamo il target, -1 per ogni passo e -5 se si morde
 % load qualita5.mat
-load qualita6.mat
-
+% load qualita6.mat
+load qualita7.mat
 % inizializziamo i parametri per l'algoritmo SARSA
 gamma = 1;
 % alpha = 1e-1;
-alpha = 0.5;
-numEpisodes = 1e6;
+alpha = 0.1;
+numEpisodes = 1e5;
 epsilon = 0.8;
 
 % definiao le dimesioni della griglia di gioco
@@ -106,10 +106,11 @@ for e = 1:numEpisodes
     H = s;
     % iteriamo fino a quando il serpente non raggiunge il target, ossia fino a
     % quando non ci troviamo in uno stato terminale
+    a = epsgreedy(Q, s, A, epsilon);
     while true
          
         % scegliamo un azione tramite un metodo EPSILON-GREEDY
-        a = epsgreedy(Q, s, A, epsilon);
+        
         
         % CALCOLIAMO LO STATO SUCCESSIVO E IL REWARD
         [sp, r, ap, count_a, count_m] = snake_model_5(s, a, aprev, e, conf, point, count_a, count_m);
@@ -160,10 +161,11 @@ for e = 1:numEpisodes
         else
             states(sp) = states(sp)+1;
             %target preso            
-            if r == 10
+            if r == 50
                 point = point+1;
                 punteggio = [punteggio, point];
                 point_tot = point_tot + 1;
+                Q(s,a) = Q(s,a) + alpha*(r-Q(s,a));
                 % fprintf("\nEPISODIO %d \n", e);
                 % fprintf("punteggio: %d \n",point);
                 % fprintf("punteggio totale: %d \n", point_tot);
@@ -171,12 +173,14 @@ for e = 1:numEpisodes
                 
             else
                 % stimo il valore della funzione qualità        
-                Qp = (1-epsilon)*max(Q(sp,:)) + epsilon/A*sum(Q(sp,:));
+                % Qp = (1-epsilon)*max(Q(sp,:)) + epsilon/A*sum(Q(sp,:));
+                a_next = epsgreedy(Q,sp,A,epsilon);
                 % aggiorniamo la funzione qualita, attraverso la legge di aggiornamento SARSA
-                Q(sp,a) = Q(sp,a) + alpha*(r + gamma*Qp - Q(sp,a));
+                Q(s,a) = Q(s,a) + alpha*(r + gamma*Q(sp,a_next) - Q(s,a));
                 % andiamo al prossimo stato salvando l'azione precedente
                 s = sp;
                 aprev = ap; 
+                a =a_next;
                 % add state to history
                 % H = [H, s];
             end
@@ -184,11 +188,8 @@ for e = 1:numEpisodes
 
     end
 
-    if mod(e, 2000) == 0
-        epsilon = epsilon*0.9; % diminuisco epsilon
-        if epsilon <= 0.5
-            epsilon = 0.8;
-        end
+    if mod(e, 5000) == 0
+        epsilon = epsilon*0.8; % diminuisco epsilon
     end
     % history_A(:, e) = count_a;
     % history_M(1, e) = count_m;
@@ -217,46 +218,22 @@ title("Storico punteggio")
 figure(4)
 bar(states, 30)
 
-figure(1)
-clr = [177,162,202; 
-    139,211,230; 
-    255,109,106;
-    239,190,125] / 255;
-b = bar(1:A, count_a,'FaceColor','flat');
-title('Preferenza azioni')
-b.CData = clr;
-
 %%
 figure(5)
-subplot(2,1,1)
 episodes = 1:length(punteggio);                                  
 degree = 3;  
-[coefficients, ~, mu] = polyfit(episodes, punteggio, degree);  % Fit con centering e scaling
+[coefficients, S, mu] = polyfit(episodes, punteggio, degree);  % Fit con centering e scaling
 polynomial_fit = polyval(coefficients, episodes, [], mu);      % Valuta il polinomio con i dati scalati
 
 hold on;
 plot(episodes, polynomial_fit, '-r', 'LineWidth', 2); % Curva di fit polinomiale
 xlabel('Episodi');
 ylabel('Punteggio');
-title('Andamento del punteggio');
-grid on;
-legend('Fit Polinomiale');
-hold off;
-
-subplot(2,1,2)
-ep = 1:length(history_m);  
-[coefficients, S, mu] = polyfit(ep, history_m, degree);  % Fit con centering e scaling
-polynomial_fit = polyval(coefficients, episodes, [], mu);      % Valuta il polinomio con i dati scalati
-
-hold on;
-plot(episodes, polynomial_fit, '-k', 'LineWidth', 2); % Curva di fit polinomiale
-xlabel('Episodi');
-ylabel('Punteggio');
-title('Andamento con cui il serpente si morde');
+title('Andamento crescente del punteggio con fit polinomiale');
 grid on;
 legend('Fit Polinomiale');
 hold off;
 
 
-%%
-save qualita6.mat Q history_A history_m punteggio states count_a 
+%% cambiato momentaneamente quaita 7
+save qualita7.mat Q history_A history_m punteggio states count_a 

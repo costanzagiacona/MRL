@@ -3,7 +3,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
     % s vettore 5 componenti da cui ricaviamo locx e locy
     % sp -> stato successivo
     gg = 10000;
-    t = 0.1;
+    t = 0.;
     % prev_dir = a;     % variabile per movimento serpente
     % points = 0;       % da passare come argomento
     direction = a; %direzione presa dopo il controllo
@@ -118,7 +118,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
     % % funzione che aggiorna la posizione del serpente
     % disegno_snake( locx, locy);
 
-    % pause(t/4);
+    pause(t/4);
     % color = ['m', 'b'];
     if mod(e,gg)==0
         % creo la figura su cui disegnare l'ambiente e il serpente
@@ -160,7 +160,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
        end
         % stato terminale
         sp = - 1; 
-        r = - 5;
+        r = - 50;
         ap = direction;
         count_m = count_m + 1;
     else
@@ -196,7 +196,7 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
         % 2)
         % se il serpente mangia il target con la testa
         if sum((locx(1)==tx) & (locy(1)==ty))==1
-            r = +10;
+            r = +50;
             sp = sub2ind([numrow,numcol, num_configurazioni, target_x, target_y], locx(1), locy(1),j,tx,ty);
             ap = direction;
     
