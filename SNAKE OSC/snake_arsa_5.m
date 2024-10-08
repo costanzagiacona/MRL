@@ -12,8 +12,8 @@ load qualita7.mat
 gamma = 1;
 % alpha = 1e-1;
 alpha = 0.1;
-numEpisodes = 1e6;
-epsilon = 0.8;
+numEpisodes = 100;
+epsilon = 0.7;
 
 % definiao le dimesioni della griglia di gioco
 numrow = 8;
@@ -188,7 +188,7 @@ for e = 1:numEpisodes
 
     end
 
-    if mod(e, 1000) == 0
+    if mod(e, 1) == 0
         epsilon = epsilon*0.8; % diminuisco epsilon
     end
     history_A(:, e) = count_a;
@@ -216,7 +216,7 @@ plot(punteggio','LineWidth', 2)
 title("Storico punteggio")
 
 figure(4)
-bar(states, 30)
+bar(states, 1000)
 
 %%
 figure(5)
