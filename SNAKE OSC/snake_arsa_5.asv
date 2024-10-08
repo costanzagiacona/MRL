@@ -12,7 +12,7 @@ load qualita7.mat
 gamma = 1;
 % alpha = 1e-1;
 alpha = 0.1;
-numEpisodes = 1e6;
+numEpisodes = 1e5;
 epsilon = 0.8;
 
 % definiao le dimesioni della griglia di gioco
@@ -188,7 +188,7 @@ for e = 1:numEpisodes
 
     end
 
-    if mod(e, 1000) == 0
+    if mod(e, 5000) == 0
         epsilon = epsilon*0.8; % diminuisco epsilon
     end
     history_A(:, e) = count_a;
