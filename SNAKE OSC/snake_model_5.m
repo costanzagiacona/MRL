@@ -2,8 +2,8 @@ function [sp, r, ap, count_a, count_m] = snake_model_5 (s, a, prev_dir, e, confi
     % s -> stato, a -> direzione, prev_dir -> azione precedente, tx -> target x, ty -> target y
     % s vettore 5 componenti da cui ricaviamo locx e locy
     % sp -> stato successivo
-    gg = 1;
-    t = 0.5;
+    gg = 10000;
+    t = 0.;
     % prev_dir = a;     % variabile per movimento serpente
     % points = 0;       % da passare come argomento
     direction = a; %direzione presa dopo il controllo
